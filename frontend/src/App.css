@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* Smooth transitions */
+* {
+  transition: colors 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+#root {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  main {
+    padding: 1rem 0.5rem;
+  }
+}
+
