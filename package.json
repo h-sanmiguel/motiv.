@@ -1,0 +1,12 @@
+{
+  "name": "prodhub",
+  "version": "1.0.0",
+  "description": "Minimalist productivity app",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "cd frontend && npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
