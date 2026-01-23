@@ -31,6 +31,9 @@ export const DailyQuote: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-lg p-6 mb-6">
+      <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-3 text-center">
+        ✨ Quote of the Day
+      </p>
       <p className="text-base font-serif italic text-gray-700 text-center mb-2">
         "{quote.text}"
       </p>
