@@ -7,6 +7,7 @@ import { PomodoroTimer } from './components/PomodoroTimer';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { About } from './components/About';
+import { DailyQuote } from './components/DailyQuote';
 import type { Notification } from './utils/notifications';
 import { requestNotificationPermission } from './utils/notifications';
 import { checkAndSendReminders } from './utils/reminders';
@@ -230,6 +231,9 @@ function App() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-48 w-full">
+        {/* Daily Quote */}
+        {currentTab !== 'about' && <DailyQuote />}
+
         {currentTab === 'tasks' && (
           <div>
             <TaskManager
