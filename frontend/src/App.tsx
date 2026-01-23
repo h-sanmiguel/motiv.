@@ -194,7 +194,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
       <Header
         notifications={notifications}
@@ -229,7 +229,7 @@ function App() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-48">
+      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-48 w-full">
         {currentTab === 'tasks' && (
           <div>
             <TaskManager
