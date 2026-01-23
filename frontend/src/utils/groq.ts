@@ -1,10 +1,9 @@
 export interface Quote {
   text: string;
   author: string;
-  date: string; // ISO date string (YYYY-MM-DD)
 }
 
-const QUOTES_API_URL = 'https://api.quotable.io/v2/quoteoftheday';
+const QUOTES_API_URL = 'https://api.quotable.io/v2/random';
 
 export const fetchDailyQuote = async (): Promise<{ text: string; author: string }> => {
   try {
@@ -31,23 +30,6 @@ export const fetchDailyQuote = async (): Promise<{ text: string; author: string 
 };
 
 export const getDailyQuote = async (): Promise<Quote> => {
-  const today = new Date().toISOString().split('T')[0];
-  
-  // Check localStorage for today's quote
-  const cachedQuote = localStorage.getItem('dailyQuote');
-  if (cachedQuote) {
-    const parsed: Quote = JSON.parse(cachedQuote);
-    if (parsed.date === today) {
-      return parsed;
-    }
-  }
-
-  // Fetch new quote for today
   const { text, author } = await fetchDailyQuote();
-  const quote: Quote = { text, author, date: today };
-  
-  // Cache it
-  localStorage.setItem('dailyQuote', JSON.stringify(quote));
-  
-  return quote;
+  return { text, author };
 };
