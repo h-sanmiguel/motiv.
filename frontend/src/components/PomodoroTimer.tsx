@@ -135,11 +135,31 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
         setSessionType('break');
         setTimeLeft((currentPreset?.shortBreakDuration || 5) * 60);
       }
-      onAddNotification?.(createPomodoroNotification(`Work session done, next: ${nextType === 'longbreak' ? 'long break' : 'short break'}`));
+      const notificationMessage = `Work session done, next: ${nextType === 'longbreak' ? 'long break' : 'short break'}`;
+      onAddNotification?.(createPomodoroNotification(notificationMessage));
+      
+      // Send browser notification immediately
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Pomodoro Timer', {
+          body: notificationMessage,
+          icon: '⏱️',
+          tag: 'pomodoro-timer',
+        });
+      }
     } else {
       setSessionType('work');
       setTimeLeft((currentPreset?.workDuration || 25) * 60);
-      onAddNotification?.(createPomodoroNotification('Break done, next: work session'));
+      const notificationMessage = 'Break done, next: work session';
+      onAddNotification?.(createPomodoroNotification(notificationMessage));
+      
+      // Send browser notification immediately
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Pomodoro Timer', {
+          body: notificationMessage,
+          icon: '⏱️',
+          tag: 'pomodoro-timer',
+        });
+      }
     }
   };
 

@@ -10,7 +10,7 @@ import { About } from './components/About';
 import { DailyQuote } from './components/DailyQuote';
 import type { Notification } from './utils/notifications';
 import { requestNotificationPermission } from './utils/notifications';
-import { checkAndSendReminders } from './utils/reminders';
+import { startRealtimeNotificationService } from './utils/realtimeNotifications';
 import './App.css';
 
 type Tab = 'tasks' | 'habits' | 'pomodoro' | 'about';
@@ -53,30 +53,31 @@ function App() {
     setNotifications([]);
   };
 
-  // Check reminders every minute
+  // Check reminders in real-time (every second, processes every minute)
   useEffect(() => {
-    const interval = setInterval(() => {
-      const { updatedHabits, updatedTasks } = checkAndSendReminders(
-        state.habits,
-        state.tasks,
-        addNotification
-      );
+    if (!isMounted) return;
 
-      // Update state if any habits or tasks changed
-      if (
-        updatedHabits.some((h, i) => h !== state.habits[i]) ||
-        updatedTasks.some((t, i) => t !== state.tasks[i])
-      ) {
-        setState(prev => ({
-          ...prev,
-          habits: updatedHabits,
-          tasks: updatedTasks,
-        }));
-      }
-    }, 60000); // Check every minute
+    const getStateSnapshot = () => ({
+      habits: state.habits,
+      tasks: state.tasks,
+    });
 
-    return () => clearInterval(interval);
-  }, [state.habits, state.tasks]);
+    const handleUpdateState = (habits: Habit[], tasks: Task[]) => {
+      setState(prev => ({
+        ...prev,
+        habits: habits,
+        tasks: tasks,
+      }));
+    };
+
+    const cleanup = startRealtimeNotificationService(
+      getStateSnapshot,
+      addNotification,
+      handleUpdateState
+    );
+
+    return cleanup;
+  }, [isMounted]);
 
   // Task handlers
   const handleAddTask = (task: Task) => {
