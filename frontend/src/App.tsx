@@ -182,19 +182,6 @@ function App() {
     }));
   };
 
-  const getTabColor = (tab: Tab) => {
-    switch (tab) {
-      case 'tasks':
-        return 'border-blue-500 text-blue-600';
-      case 'habits':
-        return 'border-purple-500 text-purple-600';
-      case 'pomodoro':
-        return 'border-red-500 text-red-600';
-      case 'about':
-        return 'border-gray-900 text-gray-900';
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
@@ -202,33 +189,9 @@ function App() {
         notifications={notifications}
         onMarkAsRead={markNotificationAsRead}
         onClearAll={clearAllNotifications}
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
       />
-
-      {/* Navigation Tabs */}
-      <nav className="bg-white border-b border-gray-100 fixed top-[100px] left-0 right-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
-            {[
-              { id: 'tasks' as const, label: 'tasks' },
-              { id: 'habits' as const, label: 'habits' },
-              { id: 'pomodoro' as const, label: 'pomodoro' },
-              { id: 'about' as const, label: 'about' },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setCurrentTab(tab.id)}
-                className={`px-1 py-4 font-medium text-sm transition border-b-2 ${
-                  currentTab === tab.id
-                    ? `${getTabColor(tab.id)} border-b-2`
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
 
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-48 w-full">

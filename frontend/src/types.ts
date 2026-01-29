@@ -19,6 +19,7 @@ export interface Task {
 export interface Habit {
   id: string;
   name: string;
+  description?: string;
   frequency: 'daily' | 'weekly';
   createdAt: number;
   completedDates: string[]; // ISO date strings (YYYY-MM-DD)

@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface NavbarProps {
-  currentTab: 'tasks' | 'habits' | 'pomodoro';
-  onTabChange: (tab: 'tasks' | 'habits' | 'pomodoro') => void;
+  currentTab: 'tasks' | 'habits' | 'pomodoro' | 'about';
+  onTabChange: (tab: 'tasks' | 'habits' | 'pomodoro' | 'about') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
@@ -10,6 +10,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
     { id: 'tasks', label: 'tasks' },
     { id: 'habits', label: 'habits' },
     { id: 'pomodoro', label: 'pomodoro' },
+    { id: 'about', label: 'about' },
   ] as const;
 
   return (
@@ -44,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange }) => {
           <div className="sm:hidden">
             <select
               value={currentTab}
-              onChange={(e) => onTabChange(e.target.value as 'tasks' | 'habits' | 'pomodoro')}
+              onChange={(e) => onTabChange(e.target.value as 'tasks' | 'habits' | 'pomodoro' | 'about')}
               className="px-3 py-2 text-sm font-medium border border-gray-300 rounded-md focus:outline-none focus:border-black"
             >
               {navItems.map(item => (

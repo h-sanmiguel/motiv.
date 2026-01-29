@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Task, Priority } from '../types';
 import { generateId } from '../utils/storage';
+import { TaskListSkeleton } from './SkeletonLoaders';
 
 interface TaskManagerProps {
   tasks: Task[];
@@ -20,8 +21,15 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [completedTaskTitle, setCompletedTaskTitle] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (showCompletionModal) {
@@ -160,7 +168,9 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
       {/* Task List */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="space-y-2">
-          {filteredTasks.length === 0 ? (
+          {loading ? (
+            <TaskListSkeleton count={3} />
+          ) : filteredTasks.length === 0 ? (
             <p className="text-center text-gray-400 py-8 text-sm">
               {filter === 'completed' ? 'no completed tasks' : 'no tasks to show'}
             </p>
@@ -170,80 +180,40 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
               return (
               <div
                 key={task.id}
-                className={`flex items-center gap-3 p-3 border border-gray-200 rounded-lg transition ${colors.border} ${colors.hover}`}
+                className={`flex items-center justify-between gap-3 p-3 border border-gray-200 rounded-lg transition ${colors.border} ${colors.hover}`}
               >
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => handleCompleteTask(task.id, task.title, task.completed)}
-                  className="w-5 h-5 rounded cursor-pointer accent-black"
-                />
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm ${task.completed ? 'line-through text-gray-400' : 'text-gray-900'}`}>
-                    {task.title}
-                  </p>
-                  <div className="space-y-2 mt-2">
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs text-gray-600 min-w-fit">reminder:</label>
-                      <select
-                        value={task.reminderType || 'automatic'}
-                        onChange={(e) => {
-                          const updatedTasks = tasks.map(t =>
-                            t.id === task.id
-                              ? { ...t, reminderType: e.target.value as any, reminderEnabled: e.target.value !== 'none' }
-                              : t
-                          );
-                          onUpdateTask?.(updatedTasks);
-                        }}
-                        className="px-2 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-gray-500"
-                      >
-                        <option value="automatic">automatic (4h)</option>
-                        <option value="manual">manual</option>
-                        <option value="none">none</option>
-                      </select>
-                    </div>
-                    {task.reminderType === 'manual' && (
-                      <div className="flex items-center gap-2">
-                        <label className="text-xs text-gray-600 min-w-fit">time:</label>
-                        <input
-                          type="time"
-                          value={task.reminderTime || '08:00'}
-                          onChange={(e) => {
-                            const updatedTasks = tasks.map(t =>
-                              t.id === task.id
-                                ? { ...t, reminderTime: e.target.value, reminderEnabled: true }
-                                : t
-                            );
-                            onUpdateTask?.(updatedTasks);
-                          }}
-                          className="px-2 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-gray-500"
-                        />
-                      </div>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => handleCompleteTask(task.id, task.title, task.completed)}
+                    className="w-5 h-5 rounded cursor-pointer accent-black flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium truncate ${task.completed ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+                      {task.title}
+                    </p>
+                    {task.description && (
+                      <p className={`text-xs truncate ${task.completed ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {task.description}
+                      </p>
                     )}
-                    <div className="flex items-center gap-2">
-                      <label className="text-xs text-gray-600 min-w-fit">deadline:</label>
-                      <input
-                        type="date"
-                        value={task.deadline || ''}
-                        onChange={(e) => {
-                          const updatedTasks = tasks.map(t =>
-                            t.id === task.id
-                              ? { ...t, deadline: e.target.value || undefined }
-                              : t
-                          );
-                          onUpdateTask?.(updatedTasks);
-                        }}
-                        className="px-2 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-gray-500"
-                      />
-                    </div>
                   </div>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors.badge}`}>
+                <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${colors.badge}`}>
                   {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                 </span>
                 <button
+                  onClick={() => setEditingTaskId(task.id)}
+                  className="text-gray-400 hover:text-gray-900 transition flex-shrink-0"
+                  title="edit"
+                >
+                  ✎
+                </button>
+                <button
                   onClick={() => onDeleteTask(task.id)}
-                  className="text-red-500 hover:text-red-700 transition"
+                  className="text-gray-400 hover:text-red-500 transition flex-shrink-0"
+                  title="delete"
                 >
                   ×
                 </button>
@@ -253,6 +223,100 @@ export const TaskManager: React.FC<TaskManagerProps> = ({
           )}
         </div>
       </div>
+
+      {/* Edit Task Modal */}
+      {editingTaskId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6 space-y-4">
+            <h2 className="text-lg font-medium">edit task</h2>
+            
+            {tasks.find(t => t.id === editingTaskId) && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs text-gray-600 font-medium block mb-2">description</label>
+                  <textarea
+                    value={tasks.find(t => t.id === editingTaskId)?.description || ''}
+                    onChange={(e) => {
+                      const updatedTasks = tasks.map(t =>
+                        t.id === editingTaskId ? { ...t, description: e.target.value } : t
+                      );
+                      onUpdateTask?.(updatedTasks);
+                    }}
+                    placeholder="add description..."
+                    rows={5}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 text-sm resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-gray-600 font-medium block mb-2">reminder</label>
+                  <select
+                    value={tasks.find(t => t.id === editingTaskId)?.reminderType || 'automatic'}
+                    onChange={(e) => {
+                      const updatedTasks = tasks.map(t =>
+                        t.id === editingTaskId
+                          ? { ...t, reminderType: e.target.value as any, reminderEnabled: e.target.value !== 'none' }
+                          : t
+                      );
+                      onUpdateTask?.(updatedTasks);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 text-sm"
+                  >
+                    <option value="automatic">automatic (4h)</option>
+                    <option value="manual">manual</option>
+                    <option value="none">none</option>
+                  </select>
+                </div>
+
+                {tasks.find(t => t.id === editingTaskId)?.reminderType === 'manual' && (
+                  <div>
+                    <label className="text-xs text-gray-600 font-medium block mb-2">time</label>
+                    <input
+                      type="time"
+                      value={tasks.find(t => t.id === editingTaskId)?.reminderTime || '08:00'}
+                      onChange={(e) => {
+                        const updatedTasks = tasks.map(t =>
+                          t.id === editingTaskId
+                            ? { ...t, reminderTime: e.target.value, reminderEnabled: true }
+                            : t
+                        );
+                        onUpdateTask?.(updatedTasks);
+                      }}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 text-sm"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-xs text-gray-600 font-medium block mb-2">deadline</label>
+                  <input
+                    type="date"
+                    value={tasks.find(t => t.id === editingTaskId)?.deadline || ''}
+                    onChange={(e) => {
+                      const updatedTasks = tasks.map(t =>
+                        t.id === editingTaskId
+                          ? { ...t, deadline: e.target.value || undefined }
+                          : t
+                      );
+                      onUpdateTask?.(updatedTasks);
+                    }}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 text-sm"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-2 justify-end pt-2">
+              <button
+                onClick={() => setEditingTaskId(null)}
+                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition"
+              >
+                close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
